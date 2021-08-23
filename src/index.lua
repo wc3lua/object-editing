@@ -1,11 +1,28 @@
-require 'modules.other-functions.index'
-require 'modules.native-types.index'
-require 'modules.lua-lib.index'
+compiletime(function()
+    local mapName = 'test1.w3x' -- имя карты
 
-local h = Handle.get(GetEnumUnit())
+    local path = ceres.layout.mapsDirectory .. mapName
+    print('path: ', path)
+    local map, err = ceres.openMap(path)
+    print('map, err: ', map, err)
 
-print(getType(h))
+    local addNewObjects = function(keyObjects, targetMap, sourceMap)
+        for id in pairs(sourceMap.objects[keyObjects].all) do
+            if (not targetMap.objects[keyObjects]:getObject(id)) then
+                targetMap.objects[keyObjects]:setObject(id, sourceMap.objects[keyObjects]:getObject(id))
+            end
+        end
+    end
 
-print(h.handle)
+    local function addNewAllObjects(targetMap, sourceMap)
+        addNewObjects('unit', targetMap, sourceMap)
+        addNewObjects('item', targetMap, sourceMap)
+        addNewObjects('destructable', targetMap, sourceMap)
+        addNewObjects('doodad', targetMap, sourceMap)
+        addNewObjects('ability', targetMap, sourceMap)
+        addNewObjects('buff', targetMap, sourceMap)
+        addNewObjects('upgrade', targetMap, sourceMap)
+    end
 
-print(Handle.getId(h))
+    addNewAllObjects(currentMap, map)
+end)
